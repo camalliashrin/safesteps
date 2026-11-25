@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SafeSteps – AI Women Safety Prototype</title>
+<style>
+:root{--bg:#faf5f8;--card:#fff;--tx:#2a1830;--mut:#7a6a80;--pri:#c2185b;--ok:#1b8a4b;--warn:#e08a00;--bd:#ecdfe7;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1020;--card:#27172e;--tx:#f5e9f3;--mut:#b49cb9;--pri:#ff4f8b;--ok:#4cd98a;--warn:#ffb74d;--bd:#3d2a46;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1a1020;--card:#27172e;--tx:#f5e9f3;--mut:#b49cb9;--pri:#ff4f8b;--ok:#4cd98a;--warn:#ffb74d;--bd:#3d2a46;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
+#app{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column}
+header{padding:14px 18px 8px;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:19px;margin:0}h1 span{color:var(--pri)}
+.tag{font-size:11px;color:var(--mut)}
+main{flex:1;overflow-y:auto;padding:6px 16px 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+.card.warn{border-color:var(--warn)}.card.new{border-color:var(--pri)}
+.card h3{margin:0 0 6px;font-size:14px}
+.mut{color:var(--mut);font-size:13px;line-height:1.45}
+nav{display:flex;border-top:1px solid var(--bd);background:var(--card)}
+nav button{flex:1;padding:11px 2px;border:0;background:none;color:var(--mut);font-size:11px;cursor:pointer}
+nav button.on{color:var(--pri);font-weight:700}
+.bd{background:var(--pri);color:#fff;border-radius:9px;padding:0 6px;font-size:10px;margin-left:2px}
+.sos-wrap{display:flex;justify-content:center;padding:18px 0 10px}
+.sos{width:200px;height:200px;border-radius:50%;border:0;background:var(--pri);color:#fff;font-size:42px;font-weight:800;box-shadow:0 0 0 14px rgba(194,24,91,.15),0 0 0 28px rgba(194,24,91,.07);cursor:pointer}
+.sos small{display:block;font-size:12px;font-weight:500;opacity:.9;margin-top:4px}
+.btn{width:100%;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:14px;cursor:pointer;margin-top:8px}
+.btn.p{background:var(--pri);color:#fff;border-color:var(--pri)}
+.btn.g{background:var(--ok);color:#fff;border-color:var(--ok)}
+.btn.s{width:auto;margin:0;padding:6px 10px;font-size:12px}
+a.btn{display:block;text-align:center;text-decoration:none}
+a.lk{color:var(--pri);font-size:13px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.row:last-child{border-bottom:0}
+.sw{position:relative;width:44px;height:26px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:1}
+.sw i{position:absolute;inset:0;background:var(--bd);border-radius:13px;transition:.2s}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+i{background:var(--ok)}.sw input:checked+i:after{left:21px}
+input[type=text],input[type=tel]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);margin-top:6px;font-size:14px}
+.ov{position:fixed;inset:0;background:rgba(20,5,25,.88);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;color:#fff;z-index:5}
+.ov.show{display:flex}.ov .n{font-size:90px;font-weight:800;line-height:1}.ov .btn{max-width:320px}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bd);color:var(--mut);white-space:nowrap}
+.pill.ok{background:rgba(27,138,75,.18);color:var(--ok)}.pill.w{background:rgba(224,138,0,.2);color:var(--warn)}
+.map{height:110px;border-radius:12px;background:repeating-linear-gradient(0deg,var(--bd) 0 1px,transparent 1px 26px),repeating-linear-gradient(90deg,var(--bd) 0 1px,transparent 1px 26px),var(--bg);position:relative;margin:8px 0;overflow:hidden;border:1px solid var(--bd)}
+.dot{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border-radius:50%;background:var(--pri);animation:pu 1.6s infinite}
+@keyframes pu{0%{box-shadow:0 0 0 0 rgba(194,24,91,.6)}100%{box-shadow:0 0 0 26px rgba(194,24,91,0)}}
+.sms{background:var(--bg);border:1px dashed var(--bd);border-radius:12px;padding:10px;font-size:13px;line-height:1.45;word-break:break-word}
+.step{display:flex;margin:8px 0 2px}
+.step div{flex:1;text-align:center;font-size:10px;color:var(--mut)}
+.step b{display:flex;width:28px;height:28px;margin:0 auto 4px;border-radius:50%;background:var(--bd);align-items:center;justify-content:center;font-size:13px}
+.step .d{color:var(--tx);font-weight:600}.step .d b{background:var(--ok);color:#fff}
+.big{font-size:56px;font-weight:800;text-align:center;color:var(--pri);line-height:1.1}
+.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:6px 0 10px}
+.bar i{display:block;height:100%;background:var(--pri);transition:width 1s linear}
+.tl{border-left:2px solid var(--bd);margin:8px 0 8px 6px;padding-left:12px;font-size:13px}
+.tl div{margin-bottom:6px}.tl span{color:var(--mut);font-size:11px;display:block}
+.toast{position:fixed;left:16px;right:16px;bottom:80px;max-width:408px;margin:auto;background:var(--tx);color:var(--bg);padding:12px;border-radius:12px;font-size:13px;display:none;z-index:9}
+.net{margin:0 16px 6px;padding:8px 12px;border-radius:10px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.net.on{background:rgba(27,138,75,.15);color:var(--ok)}.net.off{background:rgba(224,138,0,.18);color:var(--warn)}
+.net button{border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app">
+  <header><h1>Safe<span>Steps</span></h1><span class="tag">Prototype · demo data only</span></header>
+  <div class="net on" id="net"></div>
+  <main id="main"></main>
+  <nav id="nav"></nav>
+</div>
+<div class="toast" id="toast"></div>
+<div class="ov" id="ovCount">
+  <div style="color:#fff">Sending SOS in</div>
+  <div class="n" id="cn">10</div>
+  <p id="cwhy" style="opacity:.85"></p>
+  <button class="btn" id="cCancel">Cancel – I’m safe</button>
+  <button class="btn p" id="cNow">Send now</button>
+</div>
+
+<script>
+const KEY="safesteps_v2";
+const S={tab:"home",
+profile:{name:"Anita R.",phone:"+91 90000 00000"},
+contacts:[{n:"Mom",p:"+91 90000 11111"},{n:"Priya (friend)",p:"+91 90000 22222"}],
+perm:{loc:true,mic:false,motion:false},voice:{on:false,phrase:"help me now"},
+police:{num:"100",on:true},history:[],notifs:[],queue:0,last:null,
+sim:false,alert:null,cd:10,src:"",timer:null,esc:null,watch:null,drift:null};
+const PK=["profile","contacts","perm","voice","police","history","notifs","queue","last"];
+try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d)PK.forEach(k=>{if(d[k]!==undefined)S[k]=d[k];});}catch(e){}
+S.history.forEach(a=>{if(a.active){a.active=false;a.ended="Interrupted";}});
+function save(){try{const o={};PK.forEach(k=>o[k]=S[k]);localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+const online=()=>!S.sim&&navigator.onLine!==false;
+const $=s=>document.querySelector(s),g=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hm=t=>new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+const dt=t=>new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const lk=(a,b)=>"https://www.google.com/maps?q="+a.toFixed(6)+","+b.toFixed(6);
+const sw=(id,on)=>`<label class="sw"><input type="checkbox" id="${id}" ${on?"checked":""}><i></i></label>`;
+const msg=a=>"EMERGENCY! "+S.profile.name+" needs help. Phone: "+S.profile.phone+". Live location: "+a.link;
+const smsAll=a=>"sms:"+S.contacts.map(c=>c.p.replace(/\s/g,"")).join(",")+"?body="+encodeURIComponent(msg(a));
+const ev=(a,l)=>a.events.push({t:Date.now(),label:l});
+function toast(t){const e=g("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",3500);}
+function notify(title,body){S.notifs.unshift({t:Date.now(),title,body,read:false});toast(title+" – "+body);save();}
+const statusOf=a=>a.help?"Help Received":a.police?"Police Alerted":a.contact?"Contact Responded":"Alert Sent";
+
+/* ---------- views ---------- */
+function stepper(a){
+  const st=[["sent","Alert Sent"],["contact","Contact Responded"],["police","Police Alerted"],["help","Help Received"]];
+  return `<div class="step">${st.map(s=>`<div class="${a[s[0]]?"d":""}"><b>${a[s[0]]?"✓":"•"}</b>${s[1]}</div>`).join("")}</div>`;
+}
+const locHTML=a=>`<b>${a.lat.toFixed(5)}, ${a.lng.toFixed(5)}</b><div class="mut">Updated ${hm(a.upd)}</div><div class="mut" style="word-break:break-all">${a.link}</div><a class="lk" href="${a.link}" target="_blank" rel="noopener">Open in Google Maps ↗</a>`;
+function home(){
+  const a=S.alert;
+  if(!a){
+    const ready=S.contacts.length>0&&S.perm.loc&&S.profile.name&&S.profile.phone;
+    return `<div class="card"><h3>Status</h3><div class="mut">${ready?"✅ Ready – "+S.contacts.length+" trusted contact(s), location on.":"⚠️ Add your name, phone, a contact and enable location."}</div>
+    <div class="mut" style="margin-top:6px">${online()?"🌐 Online: SMS + app notification, police integration available.":"📴 Offline: GPS + SMS fallback; 112 option available."}</div></div>
+    <div class="sos-wrap"><button class="sos" data-act="sos">SOS<small>Tap = instant alert</small></button></div>
+    <div class="mut" style="text-align:center">Pressing SOS immediately alerts all contacts with your live location.</div>
+    <div class="card" style="margin-top:14px"><h3>Try the demo triggers</h3>
+    <button class="btn" data-act="dVoice">🎙️ Simulate voice phrase</button>
+    <button class="btn" data-act="dMotion">📳 Simulate sudden fall / shake</button>
+    <div class="mut" style="margin-top:8px">AI triggers ask you to confirm first. They need the toggles in Settings.</div></div>`;
+  }
+  const waiting=!a.contact&&!a.police&&!a.fallback,off=!online();
+  return `<div class="card"><h3>🚨 Emergency active</h3>${stepper(a)}</div>
+  ${waiting?`<div class="card new"><h3>Waiting for a contact to respond</h3><div class="big" id="escN">${a.left}</div><div class="bar"><i id="escBar" style="width:${a.left/30*100}%"></i></div><div class="mut">No response in 30 seconds → automatic escalation to the police control room.</div></div>`:""}
+  <div class="card"><h3>📍 Live location <span class="pill ok">updating</span></h3><div class="map"><div class="dot"></div></div><div id="loc">${locHTML(a)}</div></div>
+  <div class="card"><h3>Emergency contacts</h3>
+  ${S.contacts.map((c,i)=>`<div class="row"><div>${esc(c.n)}<div class="mut">SMS ✓ · App ${a.off?"⏳ queued":"✓"}</div></div>${a.ackBy===c.n?'<span class="pill ok">Responded ✓</span>':(a.contact?"":`<button class="btn s" data-act="ack" data-i="${i}">Demo: acknowledge</button>`)}</div>`).join("")}
+  <div class="sms" style="margin-top:8px">${esc(msg(a))}</div>
+  ${off?`<a class="btn p" href="${smsAll(a)}">📩 Send SMS now (no internet needed)</a>`:""}</div>
+  ${a.police?`<div class="card"><h3>🚓 Police control room alerted <span class="pill ok">${hm(a.pt)}</span></h3>
+    <div class="row"><span class="mut">Control room</span><span>${esc(S.police.num)}</span></div>
+    <div class="row"><span class="mut">Name</span><span>${esc(S.profile.name)}</span></div>
+    <div class="row"><span class="mut">Phone</span><span>${esc(S.profile.phone)}</span></div>
+    <div class="row"><span class="mut">Message</span><span style="text-align:right">${esc(a.pmsg)}</span></div>
+    <div class="row"><span class="mut">Location</span><a class="lk" href="${a.link}" target="_blank" rel="noopener">${a.lat.toFixed(4)}, ${a.lng.toFixed(4)} ↗</a></div></div>`:""}
+  ${a.fallback?`<div class="card warn"><h3>⚠️ Police alert unavailable</h3><div class="mut">Integration is offline or not configured. Call 112 directly.</div>
+    <a class="btn p" href="tel:112">📞 Call 112</a>
+    <a class="btn" href="sms:${esc(S.police.num)}?body=${encodeURIComponent(msg(a))}">📩 SMS police control room</a></div>`:""}
+  ${!a.police&&!a.fallback?`<button class="btn" data-act="police">🚓 Alert police now</button>`:""}
+  <button class="btn g" data-act="help">🛟 Help received</button>
+  <button class="btn" data-act="safe">✅ I’m safe – cancel alert</button>`;
+}
+function contactsV(){return `
+  <div class="card"><h3>Your details (sent to police)</h3>
+  <input type="text" id="pname" value="${esc(S.profile.name)}" placeholder="Your name">
+  <input type="tel" id="pphone" value="${esc(S.profile.phone)}" placeholder="Your phone number"></div>
+  <div class="card"><h3>Emergency contacts</h3>
+  ${S.contacts.map((c,i)=>`<div class="row"><div>${esc(c.n)}<div class="mut">${esc(c.p)}</div></div><button class="btn s" data-act="del" data-i="${i}">Remove</button></div>`).join("")||'<div class="mut">None yet.</div>'}</div>
+  <div class="card"><h3>Add contact</h3><input type="text" id="cn1" placeholder="Name"><input type="tel" id="cp1" placeholder="Phone (test number)">
+  <button class="btn p" data-act="add">Add contact</button></div>`;}
+function historyV(){
+  if(!S.history.length)return '<div class="card"><div class="mut">No emergencies yet. Alerts you send will be listed here.</div></div>';
+  return S.history.map(a=>`<div class="card"><h3>${dt(a.start)} <span class="pill ${a.help?"ok":"w"}">${a.active?"Active · ":""}${statusOf(a)}</span></h3>
+  <div class="mut">Trigger: ${esc(a.src)}${a.ended?" · "+esc(a.ended):""}</div>
+  <div class="tl">${a.events.map(e=>`<div>${esc(e.label)}<span>${hm(e.t)}</span></div>`).join("")}</div>
+  <a class="lk" href="${a.link}" target="_blank" rel="noopener">Last location ↗</a></div>`).join("")+'<button class="btn" data-act="clrH">Clear history</button>';}
+function alertsV(){
+  if(!S.notifs.length)return '<div class="card"><div class="mut">No notifications yet.</div></div>';
+  return S.notifs.map(n=>`<div class="card ${n.read?"":"new"}"><h3>${esc(n.title)}</h3><div class="mut">${esc(n.body)}</div><div class="mut">${dt(n.t)}</div></div>`).join("")+'<button class="btn" data-act="clrN">Clear notifications</button>';}
+function settingsV(){return `
+  <div class="card"><h3>Permissions</h3>
+  <div class="row"><div>📍 Location (GPS)</div>${sw("pl",S.perm.loc)}</div>
+  <div class="row"><div>🎙️ Microphone</div>${sw("pm",S.perm.mic)}</div>
+  <div class="row"><div>📳 Motion sensors</div>${sw("pk",S.perm.motion)}</div></div>
+  <div class="card"><h3>AI triggers <span class="pill">optional</span></h3>
+  <div class="row"><div>Voice phrase activation</div>${sw("tv",S.voice.on)}</div>
+  <input type="text" id="ph" value="${esc(S.voice.phrase)}" placeholder="Custom phrase">
+  <div class="mut" style="margin-top:6px">AI suggestions are support, not proof of danger: you confirm before an alert is sent.</div></div>
+  <div class="card"><h3>Police escalation</h3>
+  <div class="mut">Control room number</div><input type="tel" id="pnum" value="${esc(S.police.num)}">
+  <div class="row"><div>Police integration available<div class="mut">Turn off to demo the 112 fallback</div></div>${sw("pon",S.police.on)}</div></div>
+  <div class="card"><h3>Online vs offline</h3>
+  <div class="row"><span>SOS, GPS, contacts, AI triggers</span><span class="pill ok">Both</span></div>
+  <div class="row"><span>SMS to contacts</span><span class="pill">Mobile signal</span></div>
+  <div class="row"><span>App push, police integration, live tracking</span><span class="pill">Online only</span></div>
+  <div class="mut" style="margin-top:6px">Queued for sync: ${S.queue}. Real emergencies: call 112.</div></div>`;}
+
+/* ---------- shell ---------- */
+const TABS=[["home","🏠","Home"],["contacts","👥","Contacts"],["history","🕘","History"],["alerts","🔔","Alerts"],["settings","⚙️","Settings"]];
+function render(){
+  netUI();
+  const m=g("main"),v={home,contacts:contactsV,history:historyV,alerts:alertsV,settings:settingsV}[S.tab];
+  m.innerHTML=v();
+  if(S.tab==="alerts")S.notifs.forEach(n=>n.read=true);
+  const u=S.notifs.filter(n=>!n.read).length;
+  g("nav").innerHTML=TABS.map(t=>`<button data-t="${t[0]}" class="${S.tab===t[0]?"on":""}">${t[1]}<br>${t[2]}${t[0]==="alerts"&&u?`<span class="bd">${u}</span>`:""}</button>`).join("");
+  save();
+}
+function netUI(){
+  const o=!online(),b=g("net");
+  b.className="net "+(o?"off":"on");
+  b.innerHTML=(o?"📴 Offline mode":"🌐 Online")+(S.queue?" · "+S.queue+" queued":"")+'<button id="simBtn">'+(S.sim?"Go online":"Simulate offline")+"</button>";
+  g("simBtn").onclick=()=>{S.sim=!S.sim;if(online())sync();render();};
+}
+function sync(){
+  if(S.alert&&S.alert.off){S.alert.off=false;ev(S.alert,"Back online – app notification delivered, tracking synced");}
+  if(!S.queue)return;
+  const n=S.queue;S.queue=0;notify("Back online","Synced "+n+" queued alert(s) to the cloud.");
+}
+addEventListener("online",()=>{if(online()){sync();render();}});
+addEventListener("offline",render);
+
+/* ---------- emergency logic ---------- */
+function startCd(src){
+  if(S.alert)return;
+  S.cd=10;S.src=src;
+  g("cwhy").textContent="Possible emergency detected. Are you OK? Tap cancel if this is a false alarm.";
+  g("cn").textContent=S.cd;g("ovCount").classList.add("show");
+  clearInterval(S.timer);
+  S.timer=setInterval(()=>{S.cd--;g("cn").textContent=S.cd;if(S.cd<=0){stopCd();trig(S.src);}},1000);
+}
+function stopCd(){clearInterval(S.timer);g("ovCount").classList.remove("show");}
+function trig(src){
+  if(S.alert)return;
+  if(!S.profile.name||!S.profile.phone)return alert("Add your name and phone in Contacts first.");
+  if(!S.contacts.length)return alert("Add at least one emergency contact first.");
+  if(!S.perm.loc)return alert("Enable location permission in Settings first.");
+  const b=S.last||{lat:12.4979,lng:77.9011},off=!online();
+  const a={start:Date.now(),src,lat:b.lat,lng:b.lng,link:lk(b.lat,b.lng),upd:Date.now(),active:true,
+    sent:true,contact:false,police:false,help:false,fallback:false,ackBy:"",left:30,off,events:[]};
+  ev(a,"Alert Sent – SMS"+(off?"":" + app notification")+" to "+S.contacts.length+" contact(s) with live location");
+  S.alert=a;S.history.unshift(a);
+  if(off)S.queue++;
+  notify("🚨 Alert Sent",off?"SMS ready; app notification queued until online.":"SMS + app notification sent to "+S.contacts.length+" contact(s).");
+  startLive(a);
+  clearInterval(S.esc);S.esc=setInterval(escTick,1000);
+  S.tab="home";render();
+}
+function startLive(a){
+  stopLive();let ok=false;
+  const upd=(la,ln)=>{a.lat=la;a.lng=ln;a.link=lk(la,ln);a.upd=Date.now();S.last={lat:la,lng:ln};const e=g("loc");if(e&&S.alert===a&&S.tab==="home")e.innerHTML=locHTML(a);};
+  try{S.watch=navigator.geolocation.watchPosition(p=>{ok=true;upd(p.coords.latitude,p.coords.longitude);},()=>{},{enableHighAccuracy:true,maximumAge:5000});}catch(e){}
+  S.drift=setInterval(()=>{if(!ok&&a.active)upd(a.lat+(Math.random()-.4)*0.0003,a.lng+(Math.random()-.4)*0.0003);},3000);
+}
+function stopLive(){try{navigator.geolocation.clearWatch(S.watch);}catch(e){}clearInterval(S.drift);}
+function escTick(){
+  const a=S.alert;
+  if(!a||a.contact||a.police||a.fallback){clearInterval(S.esc);return;}
+  a.left--;
+  const n=g("escN");if(n){n.textContent=a.left;g("escBar").style.width=(a.left/30*100)+"%";}
+  if(a.left<=0){clearInterval(S.esc);escalate(a,"No trusted contact responded within 30 seconds.");}
+}
+function escalate(a,why){
+  if(a.police||a.fallback)return;
+  if(S.police.on&&online()){
+    a.police=true;a.pt=Date.now();a.pmsg=why;
+    ev(a,"Police Alerted – control room "+S.police.num+" received name, phone, message and live location");
+    notify("🚓 Police Alerted","Control room received your details and live location.");
+  }else{
+    a.fallback=true;
+    ev(a,"Police integration unavailable – 112 call option shown");
+    notify("⚠️ Police alert unavailable","Call 112 now.");
+  }
+  render();
+}
+function ack(i){
+  const a=S.alert;if(!a||a.contact)return;
+  a.contact=true;a.ackBy=S.contacts[i].n;clearInterval(S.esc);
+  ev(a,"Contact Responded – "+a.ackBy+" acknowledged");
+  notify("✅ Contact Responded",a.ackBy+" acknowledged your alert.");render();
+}
+function end(why,helped){
+  const a=S.alert;if(!a)return;
+  if(helped){a.help=true;ev(a,"Help Received");}else ev(a,"Cancelled – user is safe");
+  a.active=false;a.ended=why;S.alert=null;clearInterval(S.esc);stopLive();
+  notify(helped?"🛟 Help Received":"✅ Alert cancelled",helped?"Emergency closed.":"Contacts were told you are safe.");render();
+}
+
+/* ---------- events ---------- */
+g("main").onclick=e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const i=+b.dataset.i,x=b.dataset.act;
+  if(x==="sos")trig("Manual SOS");
+  if(x==="dVoice"){if(!S.voice.on||!S.perm.mic)return alert("Turn on voice activation and microphone permission in Settings.");startCd("Voice phrase “"+S.voice.phrase+"” detected");}
+  if(x==="dMotion"){if(!S.perm.motion)return alert("Turn on motion sensors in Settings.");startCd("AI motion signal (sudden fall)");}
+  if(x==="ack")ack(i);
+  if(x==="police"){const a=S.alert;if(a){clearInterval(S.esc);escalate(a,"User requested police escalation.");}}
+  if(x==="help")end("Help received",true);
+  if(x==="safe")end("Cancelled – safe",false);
+  if(x==="add"){const n=g("cn1").value.trim(),p=g("cp1").value.trim();if(!n||!p)return alert("Enter a name and phone number.");S.contacts.push({n,p});render();}
+  if(x==="del"){S.contacts.splice(i,1);render();}
+  if(x==="clrH"){S.history=S.history.filter(a=>a.active);render();}
+  if(x==="clrN"){S.notifs=[];render();}
+};
+g("main").onchange=e=>{
+  const id=e.target.id,v=e.target.value,c=e.target.checked;
+  if(id==="pname")S.profile.name=v.trim();
+  if(id==="pphone")S.profile.phone=v.trim();
+  if(id==="ph")S.voice.phrase=v||"help me now";
+  if(id==="pnum")S.police.num=v.trim()||"100";
+  if(id==="pon")S.police.on=c;
+  if(id==="pl")S.perm.loc=c;
+  if(id==="pk")S.perm.motion=c;
+  if(id==="pm"){S.perm.mic=c;if(!c)S.voice.on=false;render();}
+  if(id==="tv"){S.voice.on=c;if(c)S.perm.mic=true;render();}
+  save();
+};
+g("nav").onclick=e=>{const b=e.target.closest("[data-t]");if(b){S.tab=b.dataset.t;render();}};
+g("cCancel").onclick=stopCd;
+g("cNow").onclick=()=>{stopCd();trig(S.src);};
+render();
+</script>
+</body>
+</html>
